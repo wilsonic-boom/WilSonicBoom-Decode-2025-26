@@ -70,6 +70,10 @@ public class configurewebcam extends LinearOpMode
     final int RESOLUTION_WIDTH = 640;
     final int RESOLUTION_HEIGHT = 480;
 
+
+
+    int number = 210;
+
     // Internal state
     boolean lastX;
     int frameCount;
