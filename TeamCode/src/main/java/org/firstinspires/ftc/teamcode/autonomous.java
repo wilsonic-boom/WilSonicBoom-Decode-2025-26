@@ -9,7 +9,7 @@ import java.lang.Math;
 @TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
 public class autonomous extends LinearOpMode {
 
-    // Declare OpMode members.
+    // Declare OpMode members. alr
     private DcMotorEx motorFL = null;
     private DcMotorEx motorFR = null;
     private DcMotorEx motorBL = null;
