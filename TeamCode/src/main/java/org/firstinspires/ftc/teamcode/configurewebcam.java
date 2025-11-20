@@ -69,7 +69,7 @@ public class configurewebcam extends LinearOpMode
     final BuiltinCameraDirection INTERNAL_CAM_DIR = BuiltinCameraDirection.BACK;
     final int RESOLUTION_WIDTH = 640;
     final int RESOLUTION_HEIGHT = 480;
-
+    int width = 500;;
     // Internal state
     boolean lastX;
     int frameCount;
