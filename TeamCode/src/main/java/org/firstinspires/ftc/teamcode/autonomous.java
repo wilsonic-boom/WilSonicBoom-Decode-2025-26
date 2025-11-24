@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.opencv.core.Mat;
+
 import java.lang.Math;
 
 
@@ -23,12 +26,63 @@ public class autonomous extends LinearOpMode {
     double orientation = 0;
     int side = -1;
 
-    public void setOrientation(double nx){
-        int hi = 0;
+    public void setOrientation(double deg){
+        double L = 1;
+        double W = 1;
+        double radius = 0.5;
+        double RPM = 2200;
+        if (deg > orientation) {
+            double ddeg = deg - orientation;
+            double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
+
+            //𝑟 r = wheel radius
+            //𝑅 R = motor RPM
+            //𝐿 L = half the robot’s length (distance from center to front/back axle)
+            //𝑊 W = half the robot’s width (distance from center to left/right axle)
+            //=2r = wheel diameter
+            //𝜃 θ = desired rotation angle (in radians)
+            //𝑡 t = time to power the motors
+
+            motorFL.setPower(-1);
+            motorFR.setPower(-1);
+            motorBL.setPower(-1);
+            motorBR.setPower(-1);
+            sleep((long) t);
+            motorFL.setPower(0);
+            motorFR.setPower(0);
+            motorBL.setPower(0);
+            motorBR.setPower(0);
+
+            orientation = deg;
+        } else {
+            double ddeg = orientation - deg;
+            double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
+
+            motorFL.setPower(1);
+            motorFR.setPower(1);
+            motorBL.setPower(1);
+            motorBR.setPower(1);
+            sleep((long) t);
+            motorFL.setPower(0);
+            motorFR.setPower(0);
+            motorBL.setPower(0);
+            motorBR.setPower(0);
+        }
     }
 
     public void moveDistance(double d){
-
+        int diameter = 1;
+        int RPM = 2200;
+        double t = (60 * d * 1000) / (Math.PI * diameter * RPM);
+        motorFL.setPower(1);
+        motorFR.setPower(1);
+        motorBL.setPower(1);
+        motorBR.setPower(1);
+        sleep((long) t);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+        motorBL.setPower(0);
+        motorBR.setPower(0);
     }
 
     public void moveTo(double nx, double ny, double nr){
@@ -47,6 +101,9 @@ public class autonomous extends LinearOpMode {
 
         setOrientation(angle);
         moveDistance(distance);
+
+        x = nx;
+        y = ny;
     }
 
     public void goShootingArea(){
@@ -128,12 +185,12 @@ public class autonomous extends LinearOpMode {
         motorST = hardwareMap.get(DcMotorEx.class, "motorST");
         // imu = hardwareMap.get(IMU.class, "imu");
 
-        motorFR.setDirection(DcMotorEx.Direction.REVERSE);
-        motorBR.setDirection(DcMotorEx.Direction.REVERSE);
+        motorFL.setDirection(DcMotorEx.Direction.REVERSE);
+        motorBL.setDirection(DcMotorEx.Direction.REVERSE);
 
         // MATH Setup
-        x = 0;
-        y = 0;
+        x = -15;
+        y = -27;
         orientation = 0;
 
         // start positions
@@ -144,11 +201,8 @@ public class autonomous extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-
-
-
-
+            // Send calculated power to wheels
+            // Show the elapsed game time and wheel power.
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x;
@@ -163,26 +217,17 @@ public class autonomous extends LinearOpMode {
             motorBL.setPower(powerBL);
             motorFR.setPower(powerFR);
             motorBR.setPower(powerBR);
-            // Setup a variable for each drive wheel to save power level for telemetry
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
 
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
-
-            // Send calculated power to wheels
-            // Show the elapsed game time and wheel power.
             telemetry.addData("Motors", "power (%.2f)", y);
             telemetry.addData("Motors", "rpm (%.2f)", motorFR.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorFL.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBR.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBL.getVelocity());
             telemetry.update();
+
+            if (gamepad1.leftBumperWasReleased()) {
+                goShootingArea();
+            }
         }
     }
 }
