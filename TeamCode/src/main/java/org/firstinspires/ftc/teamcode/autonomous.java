@@ -236,9 +236,7 @@ public class autonomous extends LinearOpMode {
             telemetry.update();
 
             if (gamepad1.leftBumperWasReleased()) {
-                Shoot = new Thread(() -> {
-                    goShootingArea();
-                });
+                Shoot = new Thread(this::goShootingArea);
                 Shoot.start();
             }
         }
