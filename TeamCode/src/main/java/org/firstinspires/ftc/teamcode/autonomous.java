@@ -23,14 +23,30 @@ public class autonomous extends LinearOpMode {
     double orientation = 0;
     int side = -1;
 
+    public void setOrientation(double nx){
+        int hi = 0;
+    }
+
+    public void moveDistance(double d){
+
+    }
+
     public void moveTo(double nx, double ny, double nr){
         int hi = 0;
         double distance = Math.pow( Math.pow(x - nx, 2) + Math.pow(y - ny, 2), 0.5);
-        
-    }
+        double angle = 0;
+        if ((x <= nx) && (y <= ny)) {
+            angle = Math.toDegrees( Math.atan((nx-x) / (ny-y)) );
+        } else if ( (nx <= x) && (y <= ny) ) {
+            angle = 360 - Math.toDegrees( Math.atan((x-nx) / (ny-y)) );
+        } else if (x <= nx) { // ny <= y will always be true here, no need to check
+            angle = 180 - Math.toDegrees( Math.atan((nx-x) / (y-ny)) );
+        } else {
+            angle = 180 + Math.toDegrees( Math.atan((x-nx) / (y-ny)) );
+        }
 
-    public void setOrientation(double nx){
-        int hi = 0;
+        setOrientation(angle);
+        moveDistance(distance);
     }
 
     public void goShootingArea(){
