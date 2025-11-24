@@ -36,6 +36,8 @@ public class shooter extends LinearOpMode {
             while (opModeIsActive()) {
                 if (gamepad1.a) {
                     shooterMotor.setPower(1.0);
+                } else {
+                    shooterMotor.setPower(0.0);
                 }
                 if (gamepad1.b) {
                     shooterMotor.setPower(0.0);
