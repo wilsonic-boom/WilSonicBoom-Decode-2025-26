@@ -193,6 +193,7 @@ public class autonomous extends LinearOpMode {
         x = -15;
         y = -27;
         orientation = 0;
+        int test = 100;
 
         // start positions
         // startPos1 = (-15, -27, 0) or (15, -27, 0)
@@ -235,9 +236,22 @@ public class autonomous extends LinearOpMode {
             }
             telemetry.update();
 
-            if (gamepad1.leftBumperWasReleased()) {
+            if (gamepad1.leftBumperWasPressed()) {
                 Shoot = new Thread(this::goShootingArea);
                 Shoot.start();
+            }
+
+            if (gamepad1.aWasPressed()) {
+                motorFL.setPower(1);
+                motorFR.setPower(1);
+                motorBL.setPower(1);
+                motorBR.setPower(1);
+                sleep(test);
+                motorFL.setPower(0);
+                motorFR.setPower(0);
+                motorBL.setPower(0);
+                motorBR.setPower(0);
+                test *= 2;
             }
         }
     }
