@@ -63,13 +63,13 @@ import java.util.Locale;
 public class configurewebcam extends LinearOpMode
 {
     /*
-     * EDIT THESE PARAMETERS AS NEEDED al
+     * EDIT THESE PARAMETERS AS NEEDED
      */
     final boolean USING_WEBCAM = true   ;
     final BuiltinCameraDirection INTERNAL_CAM_DIR = BuiltinCameraDirection.BACK;
     final int RESOLUTION_WIDTH = 640;
     final int RESOLUTION_HEIGHT = 480;
-
+    int width = 500;;
     // Internal state
     boolean lastX;
     int frameCount;

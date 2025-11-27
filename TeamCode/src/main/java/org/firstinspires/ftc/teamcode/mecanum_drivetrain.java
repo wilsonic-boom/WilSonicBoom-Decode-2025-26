@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 /*
@@ -47,7 +48,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
+@TeleOp(name="mecanum_drivetrain", group="Linear OpMode")
 public class mecanum_drivetrain extends LinearOpMode {
 
     // Declare OpMode members.
@@ -56,11 +57,12 @@ public class mecanum_drivetrain extends LinearOpMode {
     private DcMotorEx motorBL = null;
     private DcMotorEx motorBR = null;
 
+    //private Servo servo = null;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -68,12 +70,13 @@ public class mecanum_drivetrain extends LinearOpMode {
         motorFR  = hardwareMap.get(DcMotorEx.class, "motorFR");
         motorBL  = hardwareMap.get(DcMotorEx.class, "motorBL");
         motorBR  = hardwareMap.get(DcMotorEx.class, "motorBR");
+        //servo = hardwareMap.get(Servo.class, "ramp");
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        // Wait for the game to start (driver presses START)
-        motorFR.setDirection(DcMotorEx.Direction.REVERSE);
-        motorBR.setDirection(DcMotorEx.Direction.REVERSE);
+        // Wait for the game to start (driver presses STA  RT)
+        motorFL.setDirection(DcMotorEx.Direction.REVERSE);
+        motorBL.setDirection(DcMotorEx.Direction.REVERSE);
         waitForStart();
 
         // run until the end of the match (driver presses STOP)
@@ -81,6 +84,7 @@ public class mecanum_drivetrain extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x;
+
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double powerFL = (y + x + rx) / denominator;

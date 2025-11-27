@@ -3,32 +3,108 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.opencv.core.Mat;
+
 import java.lang.Math;
 
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
 public class autonomous extends LinearOpMode {
 
-    // Declare OpMode members. alr yo its dhir here
+    // Declare OpMode members.
     private DcMotorEx motorFL = null;
     private DcMotorEx motorFR = null;
     private DcMotorEx motorBL = null;
     private DcMotorEx motorBR = null;
     private DcMotorEx motorST = null;
-    //    private IMU imu; hi im here
+    private Thread Shoot = null;
+    //    private IMU imu;
 
     // MATH Setup
-    float x = 0;
-    float y = 0;
-    float orientation = 0;
+    double x = 0;
+    double y = 0;
+    double orientation = 0;
     int side = -1;
 
-    public void moveTo(float nx, float ny, float nr){
-        int hi = 0;
+    public void setOrientation(double deg){
+        double L = 1;
+        double W = 1;
+        double radius = 0.5;
+        double RPM = 2200;
+        if (deg > orientation) {
+            double ddeg = deg - orientation;
+            double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
+
+            //𝑟 r = wheel radius
+            //𝑅 R = motor RPM
+            //𝐿 L = half the robot’s length (distance from center to front/back axle)
+            //𝑊 W = half the robot’s width (distance from center to left/right axle)
+            //=2r = wheel diameter
+            //𝜃 θ = desired rotation angle (in radians)
+            //𝑡 t = time to power the motors
+
+            motorFL.setPower(-1);
+            motorFR.setPower(-1);
+            motorBL.setPower(-1);
+            motorBR.setPower(-1);
+            sleep((long) t);
+            motorFL.setPower(0);
+            motorFR.setPower(0);
+            motorBL.setPower(0);
+            motorBR.setPower(0);
+
+            orientation = deg;
+        } else {
+            double ddeg = orientation - deg;
+            double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
+
+            motorFL.setPower(1);
+            motorFR.setPower(1);
+            motorBL.setPower(1);
+            motorBR.setPower(1);
+            sleep((long) t);
+            motorFL.setPower(0);
+            motorFR.setPower(0);
+            motorBL.setPower(0);
+            motorBR.setPower(0);
+        }
     }
 
-    public void setOrientation(float nx){
+    public void moveDistance(double d){
+        int diameter = 1;
+        int RPM = 2200;
+        double t = (60 * d * 1000) / (Math.PI * diameter * RPM);
+        motorFL.setPower(1);
+        motorFR.setPower(1);
+        motorBL.setPower(1);
+        motorBR.setPower(1);
+        sleep((long) t);
+        motorFL.setPower(0);
+        motorFR.setPower(0);
+        motorBL.setPower(0);
+        motorBR.setPower(0);
+    }
+
+    public void moveTo(double nx, double ny, double nr){
         int hi = 0;
+        double distance = Math.pow( Math.pow(x - nx, 2) + Math.pow(y - ny, 2), 0.5);
+        double angle = 0;
+        if ((x <= nx) && (y <= ny)) {
+            angle = Math.toDegrees( Math.atan((nx-x) / (ny-y)) );
+        } else if ( (nx <= x) && (y <= ny) ) {
+            angle = 360 - Math.toDegrees( Math.atan((x-nx) / (ny-y)) );
+        } else if (x <= nx) { // ny <= y will always be true here, no need to check
+            angle = 180 - Math.toDegrees( Math.atan((nx-x) / (y-ny)) );
+        } else {
+            angle = 180 + Math.toDegrees( Math.atan((x-nx) / (y-ny)) );
+        }
+
+        setOrientation(angle);
+        moveDistance(distance);
+
+        x = nx;
+        y = ny;
     }
 
     public void goShootingArea(){
@@ -46,11 +122,11 @@ public class autonomous extends LinearOpMode {
             if (x > 0){
                 // m = -1
                 // y = x
-                float x1 = (x-y)/(-2);
-                float y1 = x1;
+                double x1 = (x-y)/(-2);
+                double y1 = x1;
                 // y = x - 48
-                float x2 = (x+y+48)/(-2);
-                float y2 = x2 - 48;
+                double x2 = (x+y+48)/(-2);
+                double y2 = x2 - 48;
 
                 double r1 = Math.pow( Math.pow(x - x1, 2) + Math.pow(y - y1, 2), 0.5);
                 double r2 = Math.pow( Math.pow(x - x2, 2) + Math.pow(y - y2, 2), 0.5);
@@ -63,11 +139,11 @@ public class autonomous extends LinearOpMode {
             } else {
                 // m = 1
                 // y = -x
-                float x1 = (x+y)/(2);
-                float y1 = -x1;
+                double x1 = (x+y)/(2);
+                double y1 = -x1;
                 // y = -x - 48
-                float x2 = (-x+y+48)/(-2);
-                float y2 = -x2 - 48;
+                double x2 = (-x+y+48)/(-2);
+                double y2 = -x2 - 48;
 
                 double r1 = Math.pow( Math.pow(x - x1, 2) + Math.pow(y - y1, 2), 0.5);
                 double r2 = Math.pow( Math.pow(x - x2, 2) + Math.pow(y - y2, 2), 0.5);
@@ -88,12 +164,12 @@ public class autonomous extends LinearOpMode {
             goShootingArea();
         }
 
-        float goalx = 72 * side;
-        float goaly = 72;
+        double goalx = 72 * side;
+        double goaly = 72;
 
         double deg = (360 + side * Math.toDegrees(Math.acos((72 - y)/(Math.pow( Math.pow(goalx - x, 2) + Math.pow(goaly - y, 2), 0.5))))) % 360;
 
-        setOrientation((float) deg);
+        setOrientation((double) deg);
         motorST.setPower(1);
     }
 
@@ -110,13 +186,14 @@ public class autonomous extends LinearOpMode {
         motorST = hardwareMap.get(DcMotorEx.class, "motorST");
         // imu = hardwareMap.get(IMU.class, "imu");
 
-        motorFR.setDirection(DcMotorEx.Direction.REVERSE);
-        motorBR.setDirection(DcMotorEx.Direction.REVERSE);
+        motorFL.setDirection(DcMotorEx.Direction.REVERSE);
+        motorBL.setDirection(DcMotorEx.Direction.REVERSE);
 
         // MATH Setup
-        x = 0;
-        y = 0;
+        x = -15;
+        y = -27;
         orientation = 0;
+        int test = 100;
 
         // start positions
         // startPos1 = (-15, -27, 0) or (15, -27, 0)
@@ -126,11 +203,8 @@ public class autonomous extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-
-
-
-
+            // Send calculated power to wheels
+            // Show the elapsed game time and wheel power.
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x;
@@ -164,7 +238,34 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("Motors", "rpm (%.2f)", motorFL.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBR.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBL.getVelocity());
+
+            if (Shoot != null) {
+                if (!Shoot.isAlive()) {
+                    Shoot = null;
+                    telemetry.addData("Travelling to shooting area", false);
+                } else {
+                    telemetry.addData("Travelling to shooting area", true);
+                }
+            }
             telemetry.update();
+
+            if (gamepad1.leftBumperWasPressed()) {
+                Shoot = new Thread(this::goShootingArea);
+                Shoot.start();
+            }
+
+            if (gamepad1.aWasPressed()) {
+                motorFL.setPower(1);
+                motorFR.setPower(1);
+                motorBL.setPower(1);
+                motorBR.setPower(1);
+                sleep(test);
+                motorFL.setPower(0);
+                motorFR.setPower(0);
+                motorBL.setPower(0);
+                motorBR.setPower(0);
+                test *= 2;
+            }
         }
     }
 }
