@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
 import android.util.Size;
@@ -70,7 +70,7 @@ import java.util.List;
 
 @Disabled
 @TeleOp(name = "Concept: Vision Color-Locator (Circle)", group = "Concept")
-public class ConceptVisionColorLocator_Circle extends LinearOpMode {
+public class ConceptVisionColorLocator_Circletest extends LinearOpMode {
     @Override
     public void runOpMode() {
         /* Build a "Color Locator" vision processor based on the ColorBlobLocatorProcessor class.
