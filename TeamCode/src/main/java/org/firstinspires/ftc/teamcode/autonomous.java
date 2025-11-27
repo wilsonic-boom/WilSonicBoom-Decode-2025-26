@@ -28,10 +28,10 @@ public class autonomous extends LinearOpMode {
     int side = -1;
 
     public void setOrientation(double deg){
-        double L = 1;
-        double W = 1;
-        double radius = 0.5;
-        double RPM = 2200;
+        double L = 33.5/2.5;
+        double W = 41.5/2.5;
+        double radius = 2;
+        double RPM = 1000;
         if (deg > orientation) {
             double ddeg = deg - orientation;
             double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
@@ -72,8 +72,8 @@ public class autonomous extends LinearOpMode {
     }
 
     public void moveDistance(double d){
-        int diameter = 1;
-        int RPM = 2200;
+        int diameter = 4;
+        int RPM = 1000;
         double t = (60 * d * 1000) / (Math.PI * diameter * RPM);
         motorFL.setPower(1);
         motorFR.setPower(1);
