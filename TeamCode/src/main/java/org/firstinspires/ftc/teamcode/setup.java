@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(name="Motor Speed Test (Manual Distance)", group="Testing")
-public class MotorSpeedTestSimple extends LinearOpMode {
+public class setup extends LinearOpMode {
 
     private DcMotorEx motorFL, motorFR, motorBL, motorBR;
 
