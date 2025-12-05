@@ -91,7 +91,8 @@ public class getArtefactDistance extends LinearOpMode {
                         b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
 
                 double area = Math.pow(circleFit.getRadius(), 2) * Math.PI;
-                telemetry.addData(String.format("Area: %3 X-Value: %3d measure angle & vertical distance"))
+                telemetry.addLine(String.format("Area: %3d X-Value: %3d measure angle  vertical distance",
+                        (int) area, (int) circleFit.getX()));
             }
 
             telemetry.update();
