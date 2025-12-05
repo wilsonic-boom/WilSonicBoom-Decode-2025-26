@@ -24,14 +24,17 @@ public class autonomous extends LinearOpMode {
     // MATH Setup
     double x = 0;
     double y = 0;
+    double ex = 0;
+    double ey = 0;
     double orientation = 0;
+    double eorientation = 0;
     int side = -1;
 
     public void setOrientation(double deg){
-        double L = 33.5/2.5;
-        double W = 41.5/2.5;
+        double L = 30/2.5;
+        double W = 40/2.5;
         double radius = 2;
-        double RPM = 1000;
+        double RPM = 200;
         if (deg > orientation) {
             double ddeg = deg - orientation;
             double t = (ddeg * (L + W) * 60 * 1000) / (2 * Math.PI * radius * RPM);
@@ -73,7 +76,7 @@ public class autonomous extends LinearOpMode {
 
     public void moveDistance(double d){
         int diameter = 4;
-        int RPM = 1000;
+        int RPM = 200;
         double t = (60 * d * 1000) / (Math.PI * diameter * RPM);
         motorFL.setPower(1);
         motorFR.setPower(1);
@@ -173,6 +176,29 @@ public class autonomous extends LinearOpMode {
         motorST.setPower(1);
     }
 
+    public void updateOdometry(double a, double b, double c, double d, double t) {
+        double circumference = Math.PI * 4;
+
+        // convert rpm to meters travelled in dt
+        double dFL = circumference * (a / 60.0) * t;
+        double dFR = circumference * (b / 60.0) * t;
+        double dBL = circumference * (c / 60.0) * t;
+        double dBR = circumference * (d / 60.0) * t;
+
+        double L = 30/2.5;
+        double W = 40/2.5;
+        // mecanum
+        double dx_r = (dFL + dFR + dBL + dBR) / 4.0;
+        double dy_r = (-dFL + dFR + dBL - dBR) / 4.0;
+        double dTheta = (-dFL + dFR - dBL + dBR) / (4.0 * (L + W));
+
+        double dx_w = dx_r * Math.cos(eorientation) - dy_r * Math.sin(eorientation);
+        double dy_w = dx_r * Math.sin(eorientation) + dy_r * Math.cos(eorientation);
+
+        ex += dx_w;
+        ey += dy_w;
+        eorientation += dTheta;
+    }
     @Override
     public void runOpMode() {
         // INITIALIZE
@@ -193,6 +219,9 @@ public class autonomous extends LinearOpMode {
         x = -15;
         y = -27;
         orientation = 0;
+        ex = -15;
+        ey = -27;
+        eorientation = 0;
         int test = 100;
 
         // start positions
@@ -201,8 +230,13 @@ public class autonomous extends LinearOpMode {
 
         waitForStart();
 
+        final int FPS = 60;
+        final double FRAME_TIME = 1_000_000_000 / FPS; // in nanoseconds
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            double start = System.nanoTime();
+
             // Send calculated power to wheels
             // Show the elapsed game time and wheel power.
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
@@ -231,6 +265,7 @@ public class autonomous extends LinearOpMode {
             // leftPower  = -gamepad1.left_stick_y ;
             // rightPower = -gamepad1.right_stick_y ;
 
+            updateOdometry(motorFL.getVelocity(), motorFR.getVelocity(), motorBL.getVelocity(), motorBR.getVelocity(), 1/FPS);
             // Send calculated power to wheels
             // Show the elapsed game time and wheel power.
             telemetry.addData("Motors", "power (%.2f)", y);
@@ -238,6 +273,9 @@ public class autonomous extends LinearOpMode {
             telemetry.addData("Motors", "rpm (%.2f)", motorFL.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBR.getVelocity());
             telemetry.addData("Motors", "rpm (%.2f)", motorBL.getVelocity());
+
+            telemetry.addData("Wanted Pos", "X: " + x + " Y: " + y + " Orientation: " + orientation);
+            telemetry.addData("Estimated Pos", "X: " + ex + " Y: " + ey + " Orientation: " + eorientation);
 
             if (Shoot != null) {
                 if (!Shoot.isAlive()) {
@@ -265,6 +303,12 @@ public class autonomous extends LinearOpMode {
                 motorBL.setPower(0);
                 motorBR.setPower(0);
                 test *= 2;
+            }
+
+            double elapsed = System.nanoTime() - start;
+            double wait = (FRAME_TIME - elapsed) / 1000000;
+            if (wait > 0) {
+                sleep((long) wait);
             }
         }
     }
