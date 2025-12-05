@@ -10,7 +10,7 @@ import java.lang.Math;
 
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
-public class autonomous extends LinearOpMode {
+public class AUTO extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotorEx motorFL = null;

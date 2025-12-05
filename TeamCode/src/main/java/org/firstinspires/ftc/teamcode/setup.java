@@ -11,6 +11,7 @@ public class setup extends LinearOpMode {
 
     double[] speeds = {0.25, 0.50, 0.75, 1.0};
     int speedIndex = 0;
+    boolean rotate = false;
 
     long intervalMs = 100;
 
@@ -53,6 +54,10 @@ public class setup extends LinearOpMode {
             boolean down = gamepad1.dpad_down;
             boolean aPressed = gamepad1.a;
 
+            if (gamepad1.b) {
+                rotate = !rotate;
+            }
+
             // Speed up/down (only on button press, not hold)
             if (left && !lastLeft) speedIndex = Math.max(0, speedIndex - 1);
             if (right && !lastRight) speedIndex = Math.min(speeds.length - 1, speedIndex + 1);
@@ -87,6 +92,10 @@ public class setup extends LinearOpMode {
                 for (DcMotorEx m : motors) {
                     m.setPower(power);
                 }
+                motorFL.setPower(power);
+                motorFR.setPower(-power);
+                motorBL.setPower(power);
+                motorBR.setPower(-power);
 
                 long testStart = System.currentTimeMillis();
 
